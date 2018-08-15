@@ -11,7 +11,7 @@ process mmIndex {
 
   script:
   """
-  minimap2 -I 40G -d mmi ref
+  minimap2 -I 40G -d mmi ${ref}
   """
 }
 
@@ -27,7 +27,7 @@ process mmap {
 
   script:
   """
-  minimap2 -a mmi query | samtools view -hbF 2304 > bam
+  minimap2 -a ${mmi} ${query} | samtools view -hbF 2304 > bam
   """
 }
 
