@@ -111,7 +111,7 @@ process bam2bw {
 
   script:
   """
-  samtools depth -Q 1 --reference ${ref} final.bam | depth2bedgraph.awk > bedgraph
+  samtools depth -Q 1 --reference ${ref} final.bam | mawk -f depth2bedgraph.awk > bedgraph
   cut -f1,2 ${fai} > chrsizes
   bedGraphToBigWig bedgraph chrsizes final.bw
   """
