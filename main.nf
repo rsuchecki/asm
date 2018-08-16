@@ -1,4 +1,4 @@
-queries = Channel.fromPath(params.query).splitFasta( by: 100000, file: true, compress: true )
+queries = Channel.fromPath(params.query).splitFasta( by: params.chunk, file: true, compress: true )
 refs = Channel.fromPath(params.target)
 
 
@@ -23,20 +23,24 @@ process mmap {
     set file(mmi), file(query) from mmis.combine(queries)
 
   output:
-    file(bam) into bams
+    file("*.bam") into bams
 
   script:
   """
-  minimap2 -a ${mmi} ${query} | samtools view -hbF 2304 > bam
+  minimap2 -a ${mmi} ${query} | samtools view -hbF 2304 > ${query}.bam
   """
 }
 
 process postprocess {
+  label 'samtools'
+  cpus 10
+
   input:
-    file(bam) from bams.collect()
+    file("*.bam") from bams.collect()
 
   script:
   """
   ls -lh
+  samtools merge -u - *.bam | samtools sort --threads ${task.cpus} -o sorted.bam -
   """
 }
